@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Chat - WebSocket Demo</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        margin: 40px;
+      }
+      header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 16px;
+      }
+      #messages {
+        border: 1px solid #ccc;
+        height: 300px;
+        overflow-y: scroll;
+        padding: 10px;
+        margin-bottom: 10px;
+      }
+      #messageInput {
+        width: 300px;
+        padding: 5px;
+      }
+      button {
+        padding: 5px 10px;
+        cursor: pointer;
+      }
+      .status {
+        font-size: 13px;
+        color: #555;
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <h1>WebSocket Chat</h1>
+      <div class="status">
+        Logged in as: <span id="usernameDisplay"></span>
+        &nbsp;|&nbsp;
+        <a href="index.html">Change user</a>
+      </div>
+    </header>
+
+    <div id="messages"></div>
+    <input type="text" id="messageInput" placeholder="Enter your message" />
+    <button onclick="sendMessage()">Send Message</button>
+
+    <script>
+      const username = localStorage.getItem('chatUsername');
+
+      // If no username, send back to login
+      if (!username) {
+        window.location.href = 'index.html';
+      }
+
+      document.getElementById('usernameDisplay').textContent = username;
+
+      const ws = new WebSocket(`${location.origin.replace('http', 'ws')}`);
+      const messages = document.getElementById('messages');
+
+      ws.onopen = function () {
+        const info = document.createElement('div');
+        info.textContent = 'Connected to chat server.';
+        info.style.color = '#555';
+        messages.appendChild(info);
+      };
+
+      ws.onmessage = function (event) {
+        const messageDiv = document.createElement('div');
+        messageDiv.textContent = event.data;
+        messages.appendChild(messageDiv);
+        messages.scrollTop = messages.scrollHeight;
+      };
+
+      ws.onclose = function () {
+        const info = document.createElement('div');
+        info.textContent = 'Disconnected from chat server.';
+        info.style.color = '#c00';
+        messages.appendChild(info);
+      };
+
+      function sendMessage() {
+        const input = document.getElementById('messageInput');
+        const text = input.value.trim();
+        if (!text) return;
+
+        // Prefix with username so others see who sent it
+        ws.send(`${username}: ${text}`);
+        input.value = '';
+      }
+
+      document
+        .getElementById('messageInput')
+        .addEventListener('keypress', function (e) {
+          if (e.key === 'Enter') {
+            sendMessage();
+          }
+        });
+    </script>
+  </body>
+</html>
+

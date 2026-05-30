@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Login - WebSocket Chat</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        margin: 40px;
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 16px;
+      }
+      label {
+        font-weight: bold;
+      }
+      input {
+        padding: 6px 8px;
+        font-size: 14px;
+      }
+      button {
+        padding: 6px 12px;
+        font-size: 14px;
+        cursor: pointer;
+      }
+      .error {
+        color: #c00;
+        font-size: 13px;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>WebSocket Chat - Login</h1>
+    <p>Enter a username to join the chat.</p>
+    <label for="userName">Username</label>
+    <input type="text" id="userName" placeholder="Enter your name" />
+    <button onclick="handleLogin()">Join Chat</button>
+    <p id="error" class="error"></p>
+
+    <script>
+      function handleLogin() {
+        const input = document.getElementById('userName');
+        const errorEl = document.getElementById('error');
+        const name = input.value.trim();
+
+        if (!name) {
+          errorEl.textContent = 'Please enter a username.';
+          return;
+        }
+
+        // Clear any previous error
+        errorEl.textContent = '';
+
+        // Save username for the chat page
+        localStorage.setItem('chatUsername', name);
+
+        // Go to the chat page
+        window.location.href = 'chat.html';
+      }
+
+      // Allow Enter key to submit
+      document
+        .getElementById('userName')
+        .addEventListener('keypress', function (e) {
+          if (e.key === 'Enter') {
+            handleLogin();
+          }
+        });
+    </script>
+  </body>
+</html>
